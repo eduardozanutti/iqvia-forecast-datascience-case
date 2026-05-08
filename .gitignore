@@ -1,0 +1,51 @@
+# Dados (não versionar arquivos de dados brutos/processados)
+data/raw/
+data/bronze/
+data/silver/
+data/gold/
+
+# Modelos serializados (podem ser grandes)
+models/*.pkl
+models/*.joblib
+models/*.h5
+models/*.pt
+models/*.onnx
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# MLflow / experimentos
+mlruns/
+experiments/mlruns/
+
+# Logs
+*.log
+logs/
