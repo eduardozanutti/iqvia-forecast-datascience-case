@@ -51,6 +51,6 @@ Construir um modelo preditivo para prever a quantidade de unidades vendidas (`un
 
 - [x] Estrutura do projeto
 - [x] Preparação dos dados
-- [ ] Análise exploratória
+- [x] Análise exploratória
 - [ ] Construção e avaliação do modelo
 - [ ] Apresentação de resultados
