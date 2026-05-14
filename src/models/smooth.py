@@ -147,8 +147,8 @@ class LGBMForecaster(BaseForecaster):
         study.optimize(objective, n_trials=self.n_trials, show_progress_bar=True)
         self.study_ = study
         self.best_params_ = study.best_params
-        print(f'Melhor MASE (CV): {study.best_value:.4f}')
-        print(f'Params: {study.best_params}')
+        print(f'Best CV MASE: {study.best_value:.4f}')
+        print(f'Best params: {study.best_params}')
 
         self._fit_with_params(df_train, study.best_params)
         return self

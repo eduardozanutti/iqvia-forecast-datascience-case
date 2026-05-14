@@ -1,7 +1,7 @@
 {
   "demand_type": "smooth",
   "class": "LGBMForecaster",
-  "saved_at": "2026-05-13T12:43:00.308130+00:00",
+  "saved_at": "2026-05-14T04:06:09.254792+00:00",
   "freq": "W-MON",
   "horizon": 4,
   "n_windows": 6,

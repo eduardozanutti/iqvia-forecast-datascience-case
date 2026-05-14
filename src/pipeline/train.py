@@ -103,9 +103,9 @@ def run_training(
     freq = FeatureLoader.detect_freq(_ref)
     run_date = date.today()
 
-    print(f'Frequência detectada : {freq}')
+    print(f'Detected frequency   : {freq}')
     print(f'Demand types         : {demand_types}')
-    print(f'Horizon              : {horizon} semanas')
+    print(f'Horizon              : {horizon} weeks')
     print(f'Artifacts            : {artifact_base.resolve()}')
 
     all_results  = {}
@@ -113,12 +113,12 @@ def run_training(
 
     for dt in demand_types:
         sep = '=' * 60
-        print(f'\n{sep}\nTreinando: {dt.upper()}\n{sep}')
+        print(f'\n{sep}\nTraining: {dt.upper()}\n{sep}')
 
         df = loader.build_dataset(dt)
         df_train, df_test = train_test_split(df, horizon)
 
-        print(f'Train: {len(df_train):,} rows | {df_train["unique_id"].nunique():,} séries')
+        print(f'Train: {len(df_train):,} rows | {df_train["unique_id"].nunique():,} series')
         print(f'Test : {len(df_test):,} rows')
 
         # ── Baseline ──────────────────────────────────────────────────────────
@@ -200,7 +200,7 @@ def run_training(
 
         artifact_dir = artifact_base / dt
         model.save(artifact_dir, extra_meta=extra_meta)
-        print(f'Salvo em  : {artifact_dir}')
+        print(f'Saved to  : {artifact_dir}')
 
         all_results[dt] = {
             'baseline': baseline_metrics,
@@ -215,11 +215,11 @@ def run_training(
     bt_path  = predictions_base / 'backtest' / f'backtest_ref{ref_str}_run{run_str}.parquet'
     bt_path.parent.mkdir(parents=True, exist_ok=True)
     df_backtest.to_parquet(bt_path, index=False)
-    print(f'\nBacktest salvo: {bt_path}  ({len(df_backtest):,} linhas)')
+    print(f'\nBacktest saved: {bt_path}  ({len(df_backtest):,} rows)')
 
     # ── Summary table ─────────────────────────────────────────────────────────
     sep = '=' * 70
-    print(f'\n{sep}\nRESUMO FINAL\n{sep}')
+    print(f'\n{sep}\nFINAL SUMMARY\n{sep}')
     rows = []
     for dt, res in all_results.items():
         rows.append({'demand_type': dt, 'model': 'Baseline', **res['baseline']})
