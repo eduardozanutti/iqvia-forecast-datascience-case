@@ -1,0 +1,23 @@
+{
+  "demand_type": "lumpy",
+  "class": "StatsForecaster",
+  "saved_at": "2026-05-13T12:57:47.635945+00:00",
+  "freq": "W-MON",
+  "horizon": 4,
+  "n_windows": 6,
+  "baseline_metrics": {
+    "mase": 1.1788192224942062,
+    "smape": 0.96308013247393,
+    "wape": 1.1997051147722069,
+    "n_series": 412
+  },
+  "model_metrics": {
+    "mase": 1.1741764335549592,
+    "smape": 1.0927676337181191,
+    "wape": 0.9698436163442146,
+    "n_series": 412
+  },
+  "delta_wape_pct": 19.16,
+  "model_col": "TSB",
+  "cv_wape": 1.6553992402341646
+}
