@@ -1,0 +1,33 @@
+{
+  "demand_type": "smooth",
+  "class": "LGBMForecaster",
+  "saved_at": "2026-05-13T12:43:00.308130+00:00",
+  "freq": "W-MON",
+  "horizon": 4,
+  "n_windows": 6,
+  "baseline_metrics": {
+    "mase": 1.0492308458533681,
+    "smape": 0.7192269958338559,
+    "wape": 0.8209376035944437,
+    "n_series": 528
+  },
+  "model_metrics": {
+    "mase": 0.6251124578673187,
+    "smape": 0.4300233817589525,
+    "wape": 0.4690419456833483,
+    "n_series": 528
+  },
+  "delta_wape_pct": 42.87,
+  "best_params": {
+    "lag_preset": "medium",
+    "lag_transform": "rolling_mean_4",
+    "target_transform": "normalize",
+    "learning_rate": 0.013757730526647792,
+    "num_leaves": 313,
+    "n_estimators": 216,
+    "lambda_l1": 0.13334253006182395,
+    "lambda_l2": 0.052233872478706006,
+    "feature_fraction": 0.9028260875586587,
+    "bagging_fraction": 0.7531836767750794
+  }
+}

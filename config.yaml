@@ -1,0 +1,29 @@
+#config.yaml
+tables:
+  data_warehouse:
+    dimensional:
+      region:      'data/gold/data_warehouse/dw_dim_region.parquet'
+      product:     'data/gold/data_warehouse/dw_dim_product.parquet'
+      supplier:    'data/gold/data_warehouse/dw_dim_supplier.parquet'
+      time_series: 'data/gold/data_warehouse/dw_dim_time_series.parquet'
+      calendar:    'data/gold/data_warehouse/dw_dim_weekly_calendar.parquet'
+    fact:
+      sales: 'data/gold/data_warehouse/dw_fact_sales_weekly.parquet'
+  forecasting:
+    datasets:
+      base:    'data/gold/forecasting/datasets/base/ds_sales_timeseries.parquet'
+      refined:
+        smooth:       'data/gold/forecasting/datasets/refined/ds_sales_timeseries_smooth.parquet'
+        erratic:      'data/gold/forecasting/datasets/refined/ds_sales_timeseries_erratic.parquet'
+        intermittent: 'data/gold/forecasting/datasets/refined/ds_sales_timeseries_intermittent.parquet'
+        lumpy:        'data/gold/forecasting/datasets/refined/ds_sales_timeseries_lumpy.parquet'
+      excluded: 'data/gold/forecasting/datasets/excluded/ds_sales_timeseries_excluded.parquet'
+    features:
+      static:   'data/gold/forecasting/features/ds_features.parquet'
+      holidays: 'data/gold/forecasting/features/ds_holidays.parquet'
+      weather:  'data/gold/forecasting/features/ds_weather.parquet'
+    tags:
+      series: 'data/gold/forecasting/tags/ds_tags.parquet'
+    predictions:
+      backtest: 'data/gold/forecasting/predictions/backtest'
+      forecast: 'data/gold/forecasting/predictions/forecast'

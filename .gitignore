@@ -11,6 +11,9 @@ models/*.h5
 models/*.pt
 models/*.onnx
 
+# Artefatos de modelos treinados (pkl pode ser grande; metadata.json é rastreado)
+artifacts/models/**/model.pkl
+
 # Python
 __pycache__/
 *.py[cod]
