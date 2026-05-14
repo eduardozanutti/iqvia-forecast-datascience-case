@@ -24,10 +24,10 @@ def _model_name(model) -> str:
     return type(model).__name__.replace('SeasonalExponentialSmoothing', 'SeasonalES')
 
 
-# Registry used by predict.py to reconstruct a model from its saved column name
-# AutoARIMA(season_length=13) e AutoARIMA() produzem a mesma coluna "AutoARIMA"
-# no StatsForecast. O registry usa variantes por demand_type para o predict.py
-# selecionar a instância correta via MODEL_REGISTRY_BY_TYPE.
+# Registry used by predict.py to reconstruct a model from its saved column name.
+# AutoARIMA(season_length=13) and AutoARIMA() both produce the column "AutoARIMA"
+# in StatsForecast. MODEL_REGISTRY_BY_TYPE stores demand-type-specific variants
+# so predict.py can select the correct instance.
 MODEL_REGISTRY = {
     'AutoETS':          AutoETS(season_length=52),
     'AutoTheta':        AutoTheta(season_length=52),
@@ -49,8 +49,8 @@ MODEL_REGISTRY_BY_TYPE = {
 # Candidates evaluated via CV per demand type
 STATS_CANDIDATES = {
     'erratic': [
-        # AutoARIMA com sazonalidade trimestral — timing regular favorece ARIMA
-        # season_length=13 ao invés de 52 para evitar SARIMA com período longo (muito lento)
+        # Quarterly seasonality for AutoARIMA — regular timing favours ARIMA structure.
+        # season_length=13 instead of 52 to avoid slow SARIMA with a long period.
         AutoARIMA(season_length=13, approximation=True),
         AutoETS(season_length=52),
         AutoTheta(season_length=52),
@@ -65,8 +65,8 @@ STATS_CANDIDATES = {
         CrostonOptimized(),
     ],
     'lumpy': [
-        # AutoETS e AutoARIMA adicionados — lumpy com alguma estrutura pode se beneficiar
-        # AutoARIMA sem sazonalidade explícita: séries esparsas raramente têm padrão sazonal estável
+        # AutoETS and AutoARIMA included — lumpy series with some structure may benefit.
+        # AutoARIMA without explicit seasonality: sparse series rarely have a stable seasonal pattern.
         AutoETS(season_length=52),
         AutoARIMA(approximation=True),
         IMAPA(),
@@ -88,7 +88,7 @@ def _filter_min_length(df: pd.DataFrame, horizon: int, n_windows: int, season_le
     valid = counts[counts >= min_obs].index
     dropped = len(counts) - len(valid)
     if dropped:
-        print(f'    (descartadas {dropped} séries curtas — min_obs={min_obs})')
+        print(f'    ({dropped} short series dropped — min_obs={min_obs})')
     return df[df['unique_id'].isin(valid)]
 
 
@@ -127,7 +127,7 @@ class StatsForecaster(BaseForecaster):
             df_cv = _filter_min_length(df_train, self.horizon, self.n_windows, season_len=season)
 
             if df_cv['unique_id'].nunique() == 0:
-                print(f'  {name:<45}: sem séries suficientes, pulado')
+                print(f'  {name:<45}: no series with sufficient history, skipped')
                 continue
 
             try:
@@ -149,17 +149,17 @@ class StatsForecaster(BaseForecaster):
                 mean_w = float(np.nanmean(scores)) if scores else np.inf
                 results[col] = (model, mean_w)
                 n_s = df_cv['unique_id'].nunique()
-                print(f'  {col:<45}: CV WAPE = {mean_w:.4f}  ({n_s} séries)')
+                print(f'  {col:<45}: CV WAPE = {mean_w:.4f}  ({n_s} series)')
             except Exception as exc:
-                print(f'  {name:<45}: ERRO — {exc}')
+                print(f'  {name:<45}: ERROR — {exc}')
 
         if not results:
-            print('  Nenhum modelo completou CV — usando CrostonOptimized como fallback')
+            print('  No model completed CV — falling back to CrostonOptimized')
             return CrostonOptimized(), 'CrostonOptimized', np.inf
 
         best_col = min(results, key=lambda k: results[k][1])
         best_mdl, best_w = results[best_col]
-        print(f'\n  Vencedor: {best_col}  (CV WAPE = {best_w:.4f})')
+        print(f'\n  Winner: {best_col}  (CV WAPE = {best_w:.4f})')
         return best_mdl, best_col, best_w
 
     # ── public API ─────────────────────────────────────────────────────────────

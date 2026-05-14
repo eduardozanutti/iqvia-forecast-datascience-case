@@ -28,7 +28,7 @@ warnings.filterwarnings('ignore')
 
 DEMAND_TYPES = ['smooth', 'erratic', 'intermittent', 'lumpy']
 TARGET_COL   = 'y'
-HORIZON      = 13
+HORIZON      = 4
 SEASON_LEN   = 52
 SEED         = 42
 
@@ -65,39 +65,39 @@ def run_final_forecast(
     freq = FeatureLoader.detect_freq(_ref)
     run_date = date.today()
 
-    print(f'Frequência  : {freq}')
-    print(f'Horizon     : {horizon} semanas')
+    print(f'Frequency   : {freq}')
+    print(f'Horizon     : {horizon} weeks')
     print(f'Run date    : {run_date}')
 
     all_preds = []
 
     for dt in demand_types:
         sep = '=' * 60
-        print(f'\n{sep}\nPredizendo: {dt.upper()}\n{sep}')
+        print(f'\n{sep}\nForecasting: {dt.upper()}\n{sep}')
 
         artifact_dir = artifact_base / dt
         meta = BaseForecaster.load_metadata(artifact_dir)
         if not meta:
             raise FileNotFoundError(
-                f'metadata.json não encontrado em {artifact_dir}. '
-                f'Execute run_training() primeiro.'
+                f'metadata.json not found in {artifact_dir}. '
+                f'Run run_training() first.'
             )
 
         # Full dataset — no holdout split
         df_all = loader.build_dataset(dt)
         ref_date = df_all['ds'].max()
-        print(f'Histórico até : {ref_date.date()}  ({df_all["unique_id"].nunique():,} séries)')
+        print(f'History up to : {ref_date.date()}  ({df_all["unique_id"].nunique():,} series)')
 
         # ── Refit ─────────────────────────────────────────────────────────────
         if dt in ML_TYPES:
             best_params = meta.get('best_params')
             if not best_params:
-                raise ValueError(f'best_params ausente em {artifact_dir}/metadata.json')
+                raise ValueError(f'best_params missing in {artifact_dir}/metadata.json')
 
             model = LGBMForecaster(
                 horizon=horizon, freq=freq, seed=SEED, target_col=TARGET_COL,
             )
-            print('Refitando LGBMForecaster (sem Optuna)...')
+            print('Refitting LGBMForecaster (Optuna skipped)...')
             model.fit(df_all, best_params=best_params)
 
             avail_hol = [c for c in HOLIDAY_COLS if c in df_all.columns]
@@ -114,22 +114,22 @@ def run_final_forecast(
         else:
             model_col = meta.get('model_col')
             if not model_col:
-                raise ValueError(f'model_col ausente em {artifact_dir}/metadata.json')
+                raise ValueError(f'model_col missing in {artifact_dir}/metadata.json')
 
-            # AutoARIMA tem variantes por demand_type — tenta lookup específico primeiro
+            # AutoARIMA has demand-type variants — try the specific lookup first
             type_registry = MODEL_REGISTRY_BY_TYPE.get(dt, {})
             best_model = type_registry.get(model_col) or MODEL_REGISTRY.get(model_col)
             if best_model is None:
                 raise ValueError(
-                    f'Modelo "{model_col}" não encontrado no MODEL_REGISTRY. '
-                    f'Disponíveis: {list(MODEL_REGISTRY.keys())}'
+                    f'Model "{model_col}" not found in MODEL_REGISTRY. '
+                    f'Available: {list(MODEL_REGISTRY.keys())}'
                 )
 
             model = StatsForecaster(
                 demand_type=dt, horizon=horizon, freq=freq,
                 season_len=SEASON_LEN, target_col=TARGET_COL,
             )
-            print(f'Refitando {model_col} (sem CV)...')
+            print(f'Refitting {model_col} (CV skipped)...')
             model.fit(df_all, best_model=best_model)
             preds = model.predict()   # no df_test → raw StatsForecast output
             pred_col = model_col
@@ -142,7 +142,7 @@ def run_final_forecast(
         preds['run_date']    = run_date
         all_preds.append(preds)
 
-        print(f'Geradas {len(preds):,} previsões  '
+        print(f'Generated {len(preds):,} forecasts  '
               f'({preds["ds"].min().date()} → {preds["ds"].max().date()})')
 
     # ── Save ──────────────────────────────────────────────────────────────────
@@ -156,8 +156,8 @@ def run_final_forecast(
 
     sep = '=' * 60
     print(f'\n{sep}')
-    print(f'Forecast salvo : {out_path}')
-    print(f'Total de linhas: {len(df_forecast):,}')
+    print(f'Forecast saved : {out_path}')
+    print(f'Total rows     : {len(df_forecast):,}')
     print(df_forecast.groupby('demand_type')[['unique_id']].count().rename(
         columns={'unique_id': 'n_rows'}).to_string())
 
